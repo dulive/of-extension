@@ -1,0 +1,92 @@
+/*
+ * FlexxCom statistics extension
+ * OpenFlow 1.3
+ */
+
+//TODO: fix values to enums
+
+#version 4
+
+struct of_flexxcom_stats_request : of_experimenter_stats_request {
+    uint8_t version;
+    uint8_t type == 18;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_request_flags flags;
+    pad(4);
+    uint32_t experimenter == 0xe433; //random id
+    uint32_t subtype == ?; //device or port stats
+};
+
+struct of_flexxcom_stats_reply : of_experimenter_stats_reply {
+    uint8_t version;
+    uint8_t type == 19;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_reply_flags flags;
+    pad(4);
+    uint32_t experimenter == 0xe433; //random id
+    uint32_t subtype == ?; //device or port stats
+};
+
+struct of_flexxcom_global_stats_request : of_flexxcom_stats_request {
+    uint8_t version;
+    uint8_t type == 18;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_request_flags flags;
+    pad(4);
+    uint32_t experimenter == 0xe433;
+    uint32_t subtype == 1;
+};
+
+struct of_flexxcom_global_stats_reply : of_flexxcom_stats_reply {
+    uint8_t version;
+    uint8_t type == 19;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_reply_flags flags;
+    pad(4);
+    uint32_t experimenter == 0xe433;
+    uint32_t subtype == 1;
+
+    uint64_t consumption;
+    uint64_t load;
+};
+
+struct of_flexxcom_port_stats_request : of_flexxcom_stats_request {
+    uint8_t version;
+    uint8_t type == 18;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_request_flags flags;
+    pad(4);
+    uint32_t experimenter == 0xe433;
+    uint32_t subtype == 2;
+
+    uint16_t port_no; //single port or all ports (if port_no == OFPP_ANY)
+    pad(6);
+};
+
+struct of_flexxcom_port_stats_reply : of_flexxcom_stats_reply {
+    uint8_t version;
+    uint8_t type == 19;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_reply_flags flags;
+    pad(4);
+    uint32_t experimenter == 0xe433;
+    uint32_t subtype == 2;
+
+    uint16_t port_no;
+    pad(6);
+
+    uint64_t consumption;
+    uint64_t load;
+};

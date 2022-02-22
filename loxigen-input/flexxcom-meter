@@ -1,0 +1,55 @@
+/*
+ * FlexxCom meter extension
+ * OpenFlow 1.0 and 1.3
+ */
+
+#version 1
+#version 4
+
+enum ofp_flexxcom_meter_flags(wire_type=uint16_t, bitmask=True) {
+    OFPFCMF_LOAD_PCT   = 0x1,
+    OFPFCMF_LOAD_PKTPS = 0x2,
+    OFPFCMF_LOAD_CPU   = 0x4,
+    OFPFCMF_CON_PORT   = 0x8,
+    OFPFCMF_STATS      = 0x16
+};
+
+enum ofp_flexxcom_meter_band_type(wire_type=uint16_t) {
+    OFPFCMBT_DROP            = 1,
+    OFPFCMBT_WARN_CONTROLLER = 2
+};
+
+enum ofp_flexxcom_meter_band_value(wire_type=uint8_t) {
+    OFPFCMBV_LOAD        = 1,
+    OFPFCMBV_CONSUMPTION = 2
+};
+
+enum ofp_flexxcom_meter_mod_command(wire_type=uint16_t) {
+    OFPFCMC_ADD    = 0,
+    OFPFCMC_MODIFY = 1,
+    OFPFCMC_DELETE = 2
+};
+
+struct of_flexxcom_meter_band {
+    enum ofp_flexxcom_meter_band_type type;
+    uint16_t len;
+    //maybe add pad
+
+    uint64_t value;
+    enum ofp_flexxcom_meter_band_value value_type;
+    pad(3);
+};
+
+struct of_flexxcom_meter_mod : of_experimenter {
+    uint8_t version;
+    uint8_t type == 4;
+    uint16_t length;
+    uint32_t xid;
+    uint32_t experimenter == 0xe433;
+    uint32_t subtype == 0;
+
+    enum ofp_flexxcom_meter_mod_command command; //same as of_meter_mod
+    enum ofp_flexxcom_meter_flags flags; 
+    uint32_t meter_id; //same as of_meter_mod
+    list(of_flexxcom_meter_band_t) meters;
+};

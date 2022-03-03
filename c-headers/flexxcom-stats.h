@@ -65,7 +65,6 @@ struct ofp_flexxcom_port_stats_reply {
         uint8_t pad[6];
 
         uint64_t consumption;
-        uint64_t load;
 };
 
 #ifdef __cplusplus

@@ -4,89 +4,97 @@
 
 #version any
 
-enum ofp_flexcomm_msg_type(wire_type=uint32_t) {
-        FC_REQUEST = 0,
-        FC_REPLY = 1,
+enum of_flexcomm_subtype(wire_type=uint32_t) {
+        FC_GLOBAL_ENERGY = 0,
+        FC_PORT_ENERGY   = 1,
 };
 
-enum ofp_flexcomm_stats_type(wire_type=uint32_t) {
-        FC_ST_GLOBAL = 0,
-        FC_ST_PORT   = 1,
-};
-
-struct ofp_flexcomm_stats_header : of_experimenter {
+struct of_flexcomm_stats_request : of_experimenter_stats_request {
     uint8_t version;
-    uint8_t type == 4;
+    uint8_t type == 18;
     uint16_t length;
     uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_request_flags flags;
+    pad(4);
     uint32_t experimenter == 0xf82a;
     uint32_t subtype == ?;
 };
 
-struct ofp_flexcomm_stats_request : ofp_flexcomm_stats_header {
+struct of_flexcomm_global_energy_request : of_flexcomm_stats_request {
     uint8_t version;
-    uint8_t type == 4;
+    uint8_t type == 18;
     uint16_t length;
     uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_request_flags flags;
+    pad(4);
     uint32_t experimenter == 0xf82a;
-    uint32_t subtype == 0;//enum ofp_flexcomm_msg_type subtype == FC_REQUEST;
-    uint32_t stat_type == ?;//enum ofp_flexcomm_stats_type stat_type == ?;   //device or port stats
+    uint32_t subtype == 0;//enum of_flexcomm_subtype subtype == FC_GLOBAL_ENERGY;
 };
 
-struct ofp_flexcomm_global_stats_request : ofp_flexcomm_stats_request {
+struct of_flexcomm_port_energy_request : of_flexcomm_stats_request {
     uint8_t version;
-    uint8_t type == 4;
+    uint8_t type == 18;
     uint16_t length;
     uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_request_flags flags;
+    pad(4);
     uint32_t experimenter == 0xf82a;
-    uint32_t subtype == 0;//enum ofp_flexcomm_msg_type subtype == FC_REQUEST;
-    uint32_t stat_type == 0;//enum ofp_flexcomm_stats_type stat_type == FC_ST_GLOBAL;
-};
+    uint32_t subtype == 1;//enum of_flexcomm_subtype subtype == FC_PORT_ENERGY;
 
-struct ofp_flexcomm_port_stats_request : ofp_flexcomm_stats_request {
-    uint8_t version;
-    uint8_t type == 4;
-    uint16_t length;
-    uint32_t xid;
-    uint32_t experimenter == 0xf82a;
-    uint32_t subtype == 0;//enum ofp_flexcomm_msg_type subtype == FC_REQUEST;
-    uint32_t stat_type == 1;//enum ofp_flexcomm_stats_type stat_type == FC_ST_PORT;
     of_port_no_t port_no;
+
+    pad(4);
 };
 
-struct ofp_flexcomm_stats_reply : ofp_flexcomm_stats_header {
+struct of_flexcomm_stats_reply : of_experimenter_stats_reply {
     uint8_t version;
-    uint8_t type == 4;
+    uint8_t type == 19;
     uint16_t length;
     uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_reply_flags flags;
+    pad(4);
     uint32_t experimenter == 0xf82a;
-    uint32_t subtype == 1;//enum ofp_flexcomm_msg_type subtype == FC_REPLY;
-    uint32_t stat_type == ?;//enum ofp_flexcomm_stats_type stat_type == ?;   //device or port stats
+    uint32_t subtype == ?;
 };
 
-struct ofp_flexcomm_global_stats_reply : ofp_flexcomm_stats_reply {
+struct of_flexcomm_global_energy_reply : of_flexcomm_stats_reply {
     uint8_t version;
-    uint8_t type == 4;
+    uint8_t type == 19;
     uint16_t length;
     uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_reply_flags flags;
+    pad(4);
     uint32_t experimenter == 0xf82a;
-    uint32_t subtype == 1;//enum ofp_flexcomm_msg_type subtype == FC_REPLY;
-    uint32_t stat_type == 0;//enum ofp_flexcomm_stats_type stat_type == FC_ST_GLOBAL;
+    uint32_t subtype == 0;//enum of_flexcomm_subtype subtype == FC_GLOBAL_ENERGY;
+
+    uint64_t current_consumption;
+    uint64_t power_drawn;
+};
+
+struct of_flexcomm_port_energy_reply : of_flexcomm_stats_reply {
+    uint8_t version;
+    uint8_t type == 19;
+    uint16_t length;
+    uint32_t xid;
+    uint16_t stats_type == 0xffff;
+    enum ofp_stats_reply_flags flags;
+    pad(4);
+    uint32_t experimenter == 0xf82a;
+    uint32_t subtype == 1;//enum of_flexcomm_subtype subtype == FC_PORT_ENERGY;
+
+    list(of_flexcomm_port_stats_entry_t) entries;
+};
+
+struct of_flexcomm_port_stats_entry {
+    of_port_no_t port_no;
 
     pad(4);
 
-    uint64_t consumption;
-    uint64_t load;
-};
-
-struct ofp_flexcomm_port_stats_reply : ofp_flexcomm_stats_reply {
-    uint8_t version;
-    uint8_t type == 4;
-    uint16_t length;
-    uint32_t xid;
-    uint32_t experimenter == 0xf82a;
-    uint32_t subtype == 1;//enum ofp_flexcomm_msg_type subtype == FC_REPLY;
-    uint32_t stat_type == 1;//enum ofp_flexcomm_stats_type stat_type == FC_ST_PORT;
-    of_port_no_t port_no;
-    uint64_t consumption;
+    uint64_t current_consumption;
+    uint64_t power_drawn;
 };

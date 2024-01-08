@@ -1,3 +1,3 @@
 # of-extension
 
-Flexxcom OpenFlow Extensions
+Flexcomm OpenFlow Extensions
